@@ -10,4 +10,13 @@
         <maven.compiler.release>21</maven.compiler.release>
         <exec.mainClass>edu.upb.crypto.trep.CryptoTrep</exec.mainClass>
     </properties>
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.12.1</version>
+</dependency>
+
+    </dependencies>
 </project>

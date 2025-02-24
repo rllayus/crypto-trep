@@ -30,7 +30,9 @@ public class Functions {
     }
 
     // Insert data into Votante table
-    public static void insertVotante(String codigo, String llavePrivada) {
+    public static String insertVotante(String codigo) {
+        System.out.println("insertVotante");
+        String llavePrivada = Utils.generateUniqueKey(); // Generate key
         String sql = "INSERT INTO Votante (codigo, llave_privada) VALUES (?, ?)";
 
         try (Connection con = DataBase.getInstance().getConnection();
@@ -39,8 +41,10 @@ public class Functions {
             statement.setString(2, llavePrivada);
             statement.executeUpdate();
             logger.info("Inserted data into Votante table");
+            return llavePrivada; // Return the key
         } catch (SQLException e) {
             logger.error("Error inserting data into Votante table", e);
+            return null;
         }
     }
 
@@ -59,6 +63,7 @@ public class Functions {
     }
 
     public static void insertCandidato(String id, String nombre) {
+        System.out.println("insertCandidato");
         String sql = "INSERT INTO Candidatos (id, nombre) VALUES (?, ?)";
 
         try (Connection con = DataBase.getInstance().getConnection();
@@ -260,6 +265,7 @@ public class Functions {
 
 
     public static JsonArray getAllVotantes() {
+        System.out.println("getAllVotantes");
         JsonArray votantes = new JsonArray();
         String sql = "SELECT codigo, llave_privada FROM Votante";
 
@@ -281,6 +287,7 @@ public class Functions {
     }
 
     public static JsonArray getAllCandidatos() {
+        System.out.println("getAllCandidatos");
         JsonArray candidatos = new JsonArray();
         String sql = "SELECT id, nombre FROM Candidatos";
 
@@ -302,6 +309,7 @@ public class Functions {
     }
 
     public static JsonArray getAllBloques() {
+        System.out.println("getAllBloques");
         JsonArray bloques = new JsonArray();
         String sql = "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'Bloque_%'";
 

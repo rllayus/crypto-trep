@@ -2,7 +2,9 @@ package edu.upb.crypto.trep;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.util.Base64;
@@ -59,7 +61,15 @@ public class Utils {
         }
     }
     public static String generateUniqueKey() {
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 32); // AES-256 key
+        try {
+            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+            keyGen.init(256); // Explicit 256-bit initialization
+            SecretKey secretKey = keyGen.generateKey();
+            return Base64.getEncoder().encodeToString(secretKey.getEncoded());
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Error generating unique key: ", e);
+            return "";
+        }
     }
 
     public static String calculateHMAC(String data, String key) {

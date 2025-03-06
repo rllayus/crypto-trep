@@ -4,7 +4,6 @@
  */
 package edu.upb.crypto.trep.server;
 
-import edu.upb.crypto.trep.httpserver.ApacheServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -34,10 +33,6 @@ public class Server extends Thread {
         }
 
     }
-    
-    public static void main(String[] args) throws IOException {
-        new Server().start();
-        new ApacheServer().start();
-    }
+
 
 }

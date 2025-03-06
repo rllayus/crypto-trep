@@ -5,6 +5,7 @@
 package edu.upb.crypto.trep.httpserver;
 
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.*;
@@ -24,8 +25,20 @@ public class ApacheServer {
     public boolean start() {
         try {
             this.server = HttpServer.create(new InetSocketAddress(1914), 0);
-            this.server.createContext("/", new RootHandler());
-            this.server.createContext("/api/v1/facturas", new EchoPostHandler());
+            this.server.createContext("/", exchange -> {
+                Headers headers = exchange.getResponseHeaders();
+                headers.add("Access-Control-Allow-Origin", "*");
+                headers.add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                new RootHandler().handle(exchange);
+            });
+
+            this.server.createContext("/api/v1/insertCandidato", new InsertCandidatoHandler());
+            this.server.createContext("/api/v1/insertVotante", new InsertVotanteHandler());
+            this.server.createContext("/api/v1/registerVote", new RegisterVoteHandler());
+            this.server.createContext("/api/v1/getAllVotantes", new GetAllVotantesHandler());
+            this.server.createContext("/api/v1/getAllCandidatos", new GetAllCandidatosHandler());
+            this.server.createContext("/api/v1/getAllBloques", new GetAllBloquesHandler());
             this.server.setExecutor(Executors.newFixedThreadPool(2));
             this.server.start();
         

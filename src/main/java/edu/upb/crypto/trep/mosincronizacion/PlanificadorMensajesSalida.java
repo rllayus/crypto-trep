@@ -75,6 +75,11 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
     }
 
     @Override
+    public void onCloseNodo(SocketClient client) {
+
+    }
+
+    @Override
     public void onMessage(Comando comando) {
         // no implementar
     }

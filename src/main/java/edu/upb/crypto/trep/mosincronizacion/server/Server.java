@@ -12,12 +12,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- *
  * @author rlaredo
  */
 public class Server extends Thread {
     private static final EventListenerList listenerList = new EventListenerList();
     private final ServerSocket serverSocket;
+    private SocketEvent planificadorEntrada;
 
     public Server() throws IOException {
         this.serverSocket = new ServerSocket(1825);
@@ -29,9 +29,9 @@ public class Server extends Thread {
         while (true) {
             try {
                 Socket socket = this.serverSocket.accept();
-                SocketClient sc =new SocketClient(socket);
+                SocketClient sc = new SocketClient(socket);
                 sc.start();
-
+                sc.addListerner(planificadorEntrada);
                 notificarEvento(sc);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -41,6 +41,10 @@ public class Server extends Thread {
 
     public void addListener(SocketEvent listener) {
         this.listenerList.add(SocketEvent.class, listener);
+    }
+
+    public void addPlanificadorEntrada(SocketEvent listener) {
+        this.planificadorEntrada = listener;
     }
 
     public void notificarEvento(SocketClient socketClient) {

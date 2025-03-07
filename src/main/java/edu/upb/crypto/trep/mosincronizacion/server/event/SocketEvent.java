@@ -15,5 +15,6 @@ import java.util.EventListener;
  */
 public interface SocketEvent extends EventListener {
     void onNewNodo(SocketClient client);
+    void onCloseNodo(SocketClient client);
     void onMessage(Comando comando);
 }

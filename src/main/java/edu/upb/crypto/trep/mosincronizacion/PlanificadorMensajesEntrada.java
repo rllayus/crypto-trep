@@ -46,6 +46,11 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
     }
 
     @Override
+    public void onCloseNodo(SocketClient client) {
+
+    }
+
+    @Override
     public void onMessage(Comando comando) {
         synchronized (messages){
             messages.add(comando);

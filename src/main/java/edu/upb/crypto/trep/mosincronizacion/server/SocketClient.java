@@ -45,7 +45,7 @@ public class SocketClient extends Thread {
             while ((message = br.readLine()) != null) {
                 String[] tokens = message.split(Pattern.quote("|"));
                 Comando comando = null;
-                switch (tokens[0]){
+                switch (tokens[0]) {
                     case "0001":
                         comando = new SincronizacionNodos(this.ip);
                         comando.parsear(message);
@@ -53,6 +53,7 @@ public class SocketClient extends Thread {
 
                 }
 
+                notificar(comando);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,15 +69,15 @@ public class SocketClient extends Thread {
         }
     }
 
-    public void addListerner(SocketEvent e){
+    public void addListerner(SocketEvent e) {
         listenerList.add(SocketEvent.class, e);
     }
 
-    public void notificar(Comando comando){
+    public void notificar(Comando comando) {
         for (SocketEvent e : listenerList.getListeners(SocketEvent.class)) {
             e.onMessage(comando);
         }
     }
 
-    
+
 }

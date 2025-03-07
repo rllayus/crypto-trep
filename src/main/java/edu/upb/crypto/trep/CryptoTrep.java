@@ -26,21 +26,18 @@ public class CryptoTrep {
         System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
         PlanificadorMensajesSalida ps = new PlanificadorMensajesSalida();
         ps.start();
+        PlanificadorMensajesEntrada pe = new PlanificadorMensajesEntrada();
+        pe.start();
 
         Server server = new Server();
         server.start();
         server.addListener(ps);
+        server.addPlanificadorEntrada(pe);
 
         ApacheServer apacheServer = new ApacheServer();
         apacheServer.start();
 
-        PlanificadorMensajesEntrada pe = new PlanificadorMensajesEntrada();
-        pe.start();
-
-
-
         System.out.println(":::::::::::::::: Crypto Trep Iniciando ::::::::::::::::::");
-
         System.out.println(":::::::::::::::: NODO PRINCIPAL: "+MyProperties.IS_NODO_PRINCIPAL+" :::::::::::::::::::");
         System.out.println(":::::::::::::::: IP NODO PRINCIPAL: "+MyProperties.IP_NODO_PRINCIPAL+" :::::::::");
     }

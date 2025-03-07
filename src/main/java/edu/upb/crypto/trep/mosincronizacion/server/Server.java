@@ -4,6 +4,8 @@
  */
 package edu.upb.crypto.trep.mosincronizacion.server;
 
+import edu.upb.crypto.trep.mosincronizacion.server.event.SocketEvent;
+
 import javax.swing.event.EventListenerList;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -27,10 +29,23 @@ public class Server extends Thread {
         while (true) {
             try {
                 Socket socket = this.serverSocket.accept();
-                new SocketClient(socket).start();
+                SocketClient sc =new SocketClient(socket);
+                sc.start();
+
+                notificarEvento(sc);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void addListener(SocketEvent listener) {
+        this.listenerList.add(SocketEvent.class, listener);
+    }
+
+    public void notificarEvento(SocketClient socketClient) {
+        for (SocketEvent listener : listenerList.getListeners(SocketEvent.class)) {
+            listener.onNewNodo(socketClient);
         }
     }
 }

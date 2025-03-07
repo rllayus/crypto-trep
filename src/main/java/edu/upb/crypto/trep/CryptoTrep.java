@@ -7,6 +7,8 @@ package edu.upb.crypto.trep;
 
 import edu.upb.crypto.trep.config.MyProperties;
 import edu.upb.crypto.trep.httpserver.ApacheServer;
+import edu.upb.crypto.trep.mosincronizacion.PlanificadorMensajesEntrada;
+import edu.upb.crypto.trep.mosincronizacion.PlanificadorMensajesSalida;
 import edu.upb.crypto.trep.mosincronizacion.server.Server;
 
 import java.io.IOException;
@@ -22,8 +24,21 @@ public class CryptoTrep {
         System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
         System.out.println(":::::::::::::::: Iniciando Crypto Trep ::::::::::::::::::");
         System.out.println(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-        new Server().start();
-        new ApacheServer().start();
+        PlanificadorMensajesSalida ps = new PlanificadorMensajesSalida();
+        ps.start();
+
+        Server server = new Server();
+        server.start();
+        server.addListener(ps);
+
+        ApacheServer apacheServer = new ApacheServer();
+        apacheServer.start();
+
+        PlanificadorMensajesEntrada pe = new PlanificadorMensajesEntrada();
+        pe.start();
+
+
+
         System.out.println(":::::::::::::::: Crypto Trep Iniciando ::::::::::::::::::");
 
         System.out.println(":::::::::::::::: NODO PRINCIPAL: "+MyProperties.IS_NODO_PRINCIPAL+" :::::::::::::::::::");

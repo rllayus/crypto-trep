@@ -1,4 +1,4 @@
-package edu.upb.crypto.trep.db;
+package edu.upb.crypto.trep.DataBase.db;
 
 import java.net.ConnectException;
 import java.sql.*;

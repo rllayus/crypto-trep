@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import edu.upb.crypto.trep.db.MessageDao;
+import edu.upb.crypto.trep.DataBase.db.MessageDao;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,9 +17,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author rlaredo

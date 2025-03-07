@@ -1,4 +1,4 @@
-package edu.upb.crypto.trep.models;
+package edu.upb.crypto.trep.DataBase.models;
 
 public class Votante {
     private String codigo;

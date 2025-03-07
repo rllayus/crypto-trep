@@ -5,6 +5,12 @@
 package edu.upb.crypto.trep.mosincronizacion.server;
 
 
+import edu.upb.crypto.trep.bl.Comando;
+import edu.upb.crypto.trep.bl.SincronizacionNodos;
+import edu.upb.crypto.trep.mosincronizacion.server.event.SocketEvent;
+import lombok.Getter;
+
+import javax.swing.event.EventListenerList;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -16,7 +22,9 @@ import java.util.regex.Pattern;
 /**
  * @author rlaredo
  */
+@Getter
 public class SocketClient extends Thread {
+    private static final EventListenerList listenerList = new EventListenerList();
     private final Socket socket;
     private final String ip;
     private final DataOutputStream dout;
@@ -36,9 +44,15 @@ public class SocketClient extends Thread {
             String message;
             while ((message = br.readLine()) != null) {
                 String[] tokens = message.split(Pattern.quote("|"));
+                Comando comando = null;
                 switch (tokens[0]){
+                    case "0001":
+                        comando = new SincronizacionNodos(this.ip);
+                        comando.parsear(message);
+                        break;
 
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,6 +65,16 @@ public class SocketClient extends Thread {
             dout.flush();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void addListerner(SocketEvent e){
+        listenerList.add(SocketEvent.class, e);
+    }
+
+    public void notificar(Comando comando){
+        for (SocketEvent e : listenerList.getListeners(SocketEvent.class)) {
+            e.onMessage(comando);
         }
     }
 

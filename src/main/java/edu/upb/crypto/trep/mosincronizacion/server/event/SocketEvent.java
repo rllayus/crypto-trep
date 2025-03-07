@@ -4,6 +4,9 @@
  */
 package edu.upb.crypto.trep.mosincronizacion.server.event;
 
+import edu.upb.crypto.trep.bl.Comando;
+import edu.upb.crypto.trep.mosincronizacion.server.SocketClient;
+
 import java.util.EventListener;
 
 /**
@@ -11,4 +14,6 @@ import java.util.EventListener;
  * @author lucas
  */
 public interface SocketEvent extends EventListener {
+    void onNewNodo(SocketClient client);
+    void onMessage(Comando comando);
 }

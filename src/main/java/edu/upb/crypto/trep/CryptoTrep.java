@@ -10,8 +10,10 @@ import edu.upb.crypto.trep.httpserver.ApacheServer;
 import edu.upb.crypto.trep.mosincronizacion.PlanificadorMensajesEntrada;
 import edu.upb.crypto.trep.mosincronizacion.PlanificadorMensajesSalida;
 import edu.upb.crypto.trep.mosincronizacion.server.Server;
+import edu.upb.crypto.trep.mosincronizacion.server.SocketClient;
 
 import java.io.IOException;
+import java.net.Socket;
 
 
 /**
@@ -31,7 +33,7 @@ public class CryptoTrep {
 
         Server server = new Server();
         server.start();
-        server.addListener(ps);
+        server.addListener(ps);// Planificador de salida se suscribe a los eventos del server
         server.addPlanificadorEntrada(pe);
 
         ApacheServer apacheServer = new ApacheServer();
@@ -40,5 +42,13 @@ public class CryptoTrep {
         System.out.println(":::::::::::::::: Crypto Trep Iniciando ::::::::::::::::::");
         System.out.println(":::::::::::::::: NODO PRINCIPAL: "+MyProperties.IS_NODO_PRINCIPAL+" :::::::::::::::::::");
         System.out.println(":::::::::::::::: IP NODO PRINCIPAL: "+MyProperties.IP_NODO_PRINCIPAL+" :::::::::");
+        if(!MyProperties.IS_NODO_PRINCIPAL){
+            SocketClient socketClient = new SocketClient(new Socket(MyProperties.IP_NODO_PRINCIPAL, 1825));
+            socketClient.start();
+            ps.onNewNodo(socketClient);
+            socketClient.addListerner(pe);
+
+        }
+
     }
 }

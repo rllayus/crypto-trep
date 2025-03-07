@@ -8,6 +8,7 @@ import edu.upb.crypto.trep.mosincronizacion.server.event.SocketEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -63,16 +64,24 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
         synchronized (nodos) {
             nodos.put(client.getIp(), client);
         }
+        System.out.println("Nuevo Nodo " + client.getIp());
         if(MyProperties.IS_NODO_PRINCIPAL){
+            System.out.println("Es nodo pro " + client.getIp());
             // preparar el comando y enviar  a todo
-            Comando comando = new SincronizacionNodos(new ArrayList<>());
+            Comando comando = new SincronizacionNodos(new ArrayList<>(nodos.keySet()));
             try {
                 client.send(comando.getComando());
             }catch (Exception e){
                 e.printStackTrace();
             }
+            // enviar candidatos
+
+            // enviar votantes
+
+            // enviar bloques
         }
     }
+
 
     @Override
     public void onCloseNodo(SocketClient client) {

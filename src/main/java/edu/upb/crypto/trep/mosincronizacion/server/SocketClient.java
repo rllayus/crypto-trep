@@ -44,6 +44,7 @@ public class SocketClient extends Thread {
             String message;
             while ((message = br.readLine()) != null) {
                 String[] tokens = message.split(Pattern.quote("|"));
+                System.out.println(message);
                 Comando comando = null;
                 switch (tokens[0]) {
                     case "0001":

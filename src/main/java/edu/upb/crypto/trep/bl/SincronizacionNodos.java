@@ -14,10 +14,12 @@ import java.util.regex.Pattern;
 public class SincronizacionNodos extends Comando{
     private List<String> ips;
     public SincronizacionNodos(List<String> ips) {
+        this.setCodigoComando("0001");
         this.ips = ips;
     }
     public SincronizacionNodos(String ip){
         super();
+        this.setCodigoComando("0001");
         setIp(ip);
     }
 
@@ -33,6 +35,17 @@ public class SincronizacionNodos extends Comando{
 
     @Override
     public String getComando() {
-        return "";
+        return getCodigoComando()+"|"+ipsToString() + System.lineSeparator();
+    }
+    private String ipsToString(){
+        if(ips.isEmpty()) return "";
+
+        StringBuilder str = new StringBuilder();
+        str.append(ips.getFirst());
+        for (String ip : ips){
+            str.append(";").append(ip);
+            str.append(ip);
+        }
+        return str.toString();
     }
 }

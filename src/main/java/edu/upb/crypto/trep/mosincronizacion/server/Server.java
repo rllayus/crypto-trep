@@ -31,6 +31,7 @@ public class Server extends Thread {
                 Socket socket = this.serverSocket.accept();
                 SocketClient sc = new SocketClient(socket);
                 sc.start();
+                // que planificador de entrada se suscribe a los eventos del socketClient
                 sc.addListerner(planificadorEntrada);
                 notificarEvento(sc);
             } catch (IOException e) {

@@ -27,10 +27,12 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
                 }
                 comando = messages.poll();
             }
+            System.out.println(comando.getComando());
             switch (comando.getCodigoComando()){
                 case "0001":
 
                     break;
+
             }
         }
     }

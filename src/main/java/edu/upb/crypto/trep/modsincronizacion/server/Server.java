@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package edu.upb.crypto.trep.mosincronizacion.server;
+package edu.upb.crypto.trep.modsincronizacion.server;
 
-import edu.upb.crypto.trep.mosincronizacion.server.event.SocketEvent;
+import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 
 import javax.swing.event.EventListenerList;
 import java.io.IOException;

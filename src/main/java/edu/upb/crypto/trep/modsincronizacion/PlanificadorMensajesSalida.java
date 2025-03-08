@@ -1,10 +1,12 @@
-package edu.upb.crypto.trep.mosincronizacion;
+package edu.upb.crypto.trep.modsincronizacion;
 
+import edu.upb.crypto.trep.DataBase.models.Candidato;
 import edu.upb.crypto.trep.bl.Comando;
+import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
 import edu.upb.crypto.trep.bl.SincronizacionNodos;
 import edu.upb.crypto.trep.config.MyProperties;
-import edu.upb.crypto.trep.mosincronizacion.server.SocketClient;
-import edu.upb.crypto.trep.mosincronizacion.server.event.SocketEvent;
+import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
+import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -75,7 +77,16 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
                 e.printStackTrace();
             }
             // enviar candidatos
-
+            List<Candidato> candidatoes = new ArrayList<>();
+            candidatoes.add(new Candidato("1", "Alejandra"));
+            candidatoes.add(new Candidato("2", "Casita"));
+            candidatoes.add(new Candidato("3", "Lucas"));
+            comando = new SincronizacionCandidatos(candidatoes);
+            try {
+                client.send(comando.getComando());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             // enviar votantes
 
             // enviar bloques

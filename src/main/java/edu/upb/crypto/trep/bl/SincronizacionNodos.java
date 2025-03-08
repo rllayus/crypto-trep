@@ -42,9 +42,9 @@ public class SincronizacionNodos extends Comando{
 
         StringBuilder str = new StringBuilder();
         str.append(ips.getFirst());
-        for (String ip : ips){
-            str.append(";").append(ip);
-            str.append(ip);
+        for(int i = 1; i < ips.size(); i++){
+            str.append(";");
+            str.append(ips.get(i));
         }
         return str.toString();
     }

@@ -2,12 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package edu.upb.crypto.trep.mosincronizacion.server;
+package edu.upb.crypto.trep.modsincronizacion.server;
 
 
 import edu.upb.crypto.trep.bl.Comando;
+import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
 import edu.upb.crypto.trep.bl.SincronizacionNodos;
-import edu.upb.crypto.trep.mosincronizacion.server.event.SocketEvent;
+import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 import lombok.Getter;
 
 import javax.swing.event.EventListenerList;
@@ -49,6 +50,10 @@ public class SocketClient extends Thread {
                 switch (tokens[0]) {
                     case "0001":
                         comando = new SincronizacionNodos(this.ip);
+                        comando.parsear(message);
+                        break;
+                    case "0002":
+                        comando = new SincronizacionCandidatos(this.ip);
                         comando.parsear(message);
                         break;
 

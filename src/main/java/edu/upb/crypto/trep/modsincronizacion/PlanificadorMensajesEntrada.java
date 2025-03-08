@@ -1,8 +1,8 @@
-package edu.upb.crypto.trep.mosincronizacion;
+package edu.upb.crypto.trep.modsincronizacion;
 
 import edu.upb.crypto.trep.bl.Comando;
-import edu.upb.crypto.trep.mosincronizacion.server.SocketClient;
-import edu.upb.crypto.trep.mosincronizacion.server.event.SocketEvent;
+import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
+import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 

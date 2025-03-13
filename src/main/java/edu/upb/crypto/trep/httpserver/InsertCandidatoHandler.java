@@ -4,6 +4,9 @@ import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import edu.upb.crypto.trep.DataBase.Functions;
+import edu.upb.crypto.trep.bl.Comando;
+import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
+import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesSalida;
 import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +43,10 @@ public class InsertCandidatoHandler implements HttpHandler {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
             os.write(response.getBytes(StandardCharsets.UTF_8));
-
+            
+            Comando c =new SincronizacionCandidatos("asdasda");
+            PlanificadorMensajesSalida.addMessage(c);
+            
         } catch (Exception e) {
             logger.error("Error inserting Candidato", e);
             exchange.sendResponseHeaders(500, 0); // Send error response

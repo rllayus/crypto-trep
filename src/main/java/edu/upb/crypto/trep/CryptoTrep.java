@@ -9,7 +9,7 @@ import edu.upb.crypto.trep.config.MyProperties;
 import edu.upb.crypto.trep.httpserver.ApacheServer;
 import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesEntrada;
 import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesSalida;
-import edu.upb.crypto.trep.modsincronizacion.server.Server;
+import edu.upb.crypto.trep.modsincronizacion.server.Zeus;
 import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class CryptoTrep {
         PlanificadorMensajesEntrada pe = new PlanificadorMensajesEntrada();
         pe.start();
 
-        Server server = new Server();
+        Zeus server = new Zeus();
         server.start();
         server.addListener(ps);// Planificador de salida se suscribe a los eventos del server
         server.addPlanificadorEntrada(pe);

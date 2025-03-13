@@ -4,7 +4,6 @@
  */
 package edu.upb.crypto.trep.modsincronizacion.server;
 
-
 import edu.upb.crypto.trep.bl.Comando;
 import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
 import edu.upb.crypto.trep.bl.SincronizacionNodos;
@@ -25,12 +24,12 @@ import java.util.regex.Pattern;
  */
 @Getter
 public class SocketClient extends Thread {
+
     private static final EventListenerList listenerList = new EventListenerList();
     private final Socket socket;
     private final String ip;
     private final DataOutputStream dout;
     private final BufferedReader br;
-
 
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
@@ -45,8 +44,8 @@ public class SocketClient extends Thread {
             String message;
             while ((message = br.readLine()) != null) {
                 String[] tokens = message.split(Pattern.quote("|"));
-                System.out.println(message);
                 Comando comando = null;
+                System.out.println(message);
                 switch (tokens[0]) {
                     case "0001":
                         comando = new SincronizacionNodos(this.ip);
@@ -85,5 +84,12 @@ public class SocketClient extends Thread {
         }
     }
 
+    public static void main(String[] args) throws IOException {
+        SocketClient sc = new SocketClient(new Socket("localhost", 1825));
+        sc.start();
+        sc.send("Hola!!!!" + System.lineSeparator());
+        System.out.println("Conectado al servidor: ");
+
+    }
 
 }

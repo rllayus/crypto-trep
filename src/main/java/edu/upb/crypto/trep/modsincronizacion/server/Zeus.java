@@ -10,17 +10,21 @@ import javax.swing.event.EventListenerList;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author rlaredo
  */
-public class Server extends Thread {
+public class Zeus extends Thread {
     private static final EventListenerList listenerList = new EventListenerList();
     private final ServerSocket serverSocket;
     private SocketEvent planificadorEntrada;
+    private List<Socket> sockets;
 
-    public Server() throws IOException {
+    public Zeus() throws IOException {
         this.serverSocket = new ServerSocket(1825);
+        this.sockets = new ArrayList<Socket>();
     }
 
 
@@ -29,6 +33,14 @@ public class Server extends Thread {
         while (true) {
             try {
                 Socket socket = this.serverSocket.accept();
+                if(sockets.size() > 5){
+                    System.out.println("Conexion cerrada: "+sockets.size());
+                    socket.close();
+                    socket.shutdownInput();
+                    socket.shutdownOutput();
+                    return;
+                }
+                this.sockets.add(socket);
                 SocketClient sc = new SocketClient(socket);
                 sc.start();
                 // que planificador de entrada se suscribe a los eventos del socketClient

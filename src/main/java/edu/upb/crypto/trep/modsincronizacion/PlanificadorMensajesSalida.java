@@ -1,6 +1,7 @@
 package edu.upb.crypto.trep.modsincronizacion;
 
 import edu.upb.crypto.trep.DataBase.models.Candidato;
+import edu.upb.crypto.trep.NewJFrame;
 import edu.upb.crypto.trep.bl.Comando;
 import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
 import edu.upb.crypto.trep.bl.SincronizacionNodos;
@@ -13,11 +14,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
-    private static final ConcurrentLinkedQueue<Comando> messages =new ConcurrentLinkedQueue<>();
-    private static final ConcurrentHashMap<String, SocketClient> nodos =new ConcurrentHashMap<>();
+    private static final ConcurrentLinkedQueue<Comando> messages = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentHashMap<String, SocketClient> nodos = new ConcurrentHashMap<>();
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
+    private List<Future> list = new ArrayList<>();
+
+
     public PlanificadorMensajesSalida() {
 
     }
@@ -25,7 +37,6 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
     @Override
     public void run() {
         while (true) {
-            Comando comando ;
             synchronized (messages) {
                 if (messages.isEmpty()) {
                     try {
@@ -34,32 +45,49 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
                         throw new RuntimeException(e);
                     }
                 }
-                comando = messages.poll();
-                sendMessage(comando);
+               list.add(executor.submit(() -> {
+                    Comando comando = messages.poll();
+                    sendMessage(comando);
+                }));
+               
+               if(list.size()>10){
+                   for (Future future : list) {
+                       try {
+                           future.get();
+                       } catch (Exception ex) {
+                           ex.printStackTrace();
+                       }
+                   }
+                   list.clear();
+                   messages.notify();
+               }
+               
+               
+               
+
             }
         }
     }
 
-    public static void addMessage(Comando comando){
-        synchronized (messages){
+    public static void addMessage(Comando comando) {
+        synchronized (messages) {
             messages.add(comando);
             messages.notify();
         }
     }
 
-    private void sendMessage(Comando comando){
+    private void sendMessage(Comando comando) {
         Iterator<SocketClient> iterator = nodos.values().iterator();
         while (iterator.hasNext()) {
             SocketClient nodo = iterator.next();
             try {
                 nodo.send(comando.getComando());
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
     }
-
 
     @Override
     public void onNewNodo(SocketClient client) {
@@ -67,13 +95,13 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
             nodos.put(client.getIp(), client);
         }
         System.out.println("Nuevo Nodo " + client.getIp());
-        if(MyProperties.IS_NODO_PRINCIPAL){
+        if (MyProperties.IS_NODO_PRINCIPAL) {
             System.out.println("Es nodo pro " + client.getIp());
             // preparar el comando y enviar  a todo
             Comando comando = new SincronizacionNodos(new ArrayList<>(nodos.keySet()));
             try {
                 client.send(comando.getComando());
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             // enviar candidatos
@@ -84,7 +112,7 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
             comando = new SincronizacionCandidatos(candidatoes);
             try {
                 client.send(comando.getComando());
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             // enviar votantes
@@ -92,7 +120,6 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
             // enviar bloques
         }
     }
-
 
     @Override
     public void onCloseNodo(SocketClient client) {

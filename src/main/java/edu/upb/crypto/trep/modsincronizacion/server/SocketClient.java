@@ -4,6 +4,7 @@
  */
 package edu.upb.crypto.trep.modsincronizacion.server;
 
+import edu.upb.crypto.trep.bl.AltaCandidato;
 import edu.upb.crypto.trep.bl.Comando;
 import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
 import edu.upb.crypto.trep.bl.SincronizacionNodos;
@@ -45,7 +46,6 @@ public class SocketClient extends Thread {
             while ((message = br.readLine()) != null) {
                 String[] tokens = message.split(Pattern.quote("|"));
                 Comando comando = null;
-                System.out.println(message);
                 switch (tokens[0]) {
                     case "0001":
                         comando = new SincronizacionNodos(this.ip);
@@ -53,6 +53,10 @@ public class SocketClient extends Thread {
                         break;
                     case "0002":
                         comando = new SincronizacionCandidatos(this.ip);
+                        comando.parsear(message);
+                        break;
+                    case "0003":
+                        comando = new AltaCandidato(this.ip);
                         comando.parsear(message);
                         break;
 

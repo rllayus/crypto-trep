@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import edu.upb.crypto.trep.DataBase.Functions;
+import edu.upb.crypto.trep.DataBase.models.Candidato;
+import edu.upb.crypto.trep.bl.AltaCandidato;
 import edu.upb.crypto.trep.bl.Comando;
 import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
 import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesSalida;
@@ -15,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class InsertCandidatoHandler implements HttpHandler {
-    static Logger logger = Logger.getLogger(InsertCandidatoHandler.class);
+    //static Logger logger = Logger.getLogger(InsertCandidatoHandler.class);
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -44,11 +46,11 @@ public class InsertCandidatoHandler implements HttpHandler {
             exchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
             os.write(response.getBytes(StandardCharsets.UTF_8));
             
-            Comando c =new SincronizacionCandidatos("asdasda");
+            Comando c =new AltaCandidato(new Candidato(id, nombre));
             PlanificadorMensajesSalida.addMessage(c);
             
         } catch (Exception e) {
-            logger.error("Error inserting Candidato", e);
+            //logger.error("Error inserting Candidato", e);
             exchange.sendResponseHeaders(500, 0); // Send error response
         } finally {
             exchange.close(); // Close the exchange explicitly

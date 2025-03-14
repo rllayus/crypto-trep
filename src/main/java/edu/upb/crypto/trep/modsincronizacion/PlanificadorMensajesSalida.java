@@ -1,7 +1,6 @@
 package edu.upb.crypto.trep.modsincronizacion;
 
 import edu.upb.crypto.trep.DataBase.models.Candidato;
-import edu.upb.crypto.trep.NewJFrame;
 import edu.upb.crypto.trep.bl.Comando;
 import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
 import edu.upb.crypto.trep.bl.SincronizacionNodos;
@@ -14,13 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
@@ -58,13 +53,10 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
                            ex.printStackTrace();
                        }
                    }
+                   System.out.println("Sali: Dejando de dormir");
                    list.clear();
                    messages.notify();
                }
-               
-               
-               
-
             }
         }
     }
@@ -77,9 +69,11 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
     }
 
     private void sendMessage(Comando comando) {
-        Iterator<SocketClient> iterator = nodos.values().iterator();
-        while (iterator.hasNext()) {
-            SocketClient nodo = iterator.next();
+        for (SocketClient nodo : nodos.values()) {
+            if( nodo == null || !nodo.isAlive()){
+                nodos.remove(nodo.getIp());
+                return;
+            }
             try {
                 nodo.send(comando.getComando());
             } catch (Exception e) {

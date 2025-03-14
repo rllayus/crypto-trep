@@ -13,6 +13,8 @@ public class Candidato {
         this.id = tokens[0];
         this.nombre = tokens[1];
     }
+    public Candidato(){
+    }
 
     public String getId() {
         return id;

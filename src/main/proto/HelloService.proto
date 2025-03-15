@@ -1,0 +1,17 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package edu.upb.crypto.trep.grpc;
+
+message CandidatoRequest {
+  string code = 1;
+  string name = 2;
+}
+
+message CandidatoResponse {
+  string status = 1;
+  string message =2;
+}
+
+service HelloService {
+  rpc hello(CandidatoRequest) returns (CandidatoResponse);
+}

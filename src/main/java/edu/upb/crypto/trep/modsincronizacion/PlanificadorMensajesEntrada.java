@@ -1,7 +1,6 @@
 package edu.upb.crypto.trep.modsincronizacion;
 
-import edu.upb.crypto.trep.bl.Comando;
-import edu.upb.crypto.trep.bl.SincronizacionNodos;
+import edu.upb.crypto.trep.bl.*;
 import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
 import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 
@@ -33,10 +32,19 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
                 }
                 comando = messages.poll();
             }
-            System.out.println(comando.getComando());
+            System.out.println(comando.getCodigoComando());
             switch (comando.getCodigoComando()) {
                 case "0001":
                     proceesarComando1((SincronizacionNodos) comando);
+                    break;
+                case "0009":
+                    proceesarComando9((Comando09) comando);
+                    break;
+                case "0010":
+                    proceesarComando10((Comando010) comando);
+                    break;
+                case "0011":
+                    proceesarComando11((Comando011) comando);
                     break;
 
             }
@@ -50,15 +58,34 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
                 if (!isMyIP(ip)) {
 
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 
+    private void proceesarComando9(Comando09 comando) {
+        //validar firma
 
-    private boolean isMyIP(String ip){
+        //Agregar al planificador de transacciones
+        PlanificadorTransaccion.addVoto(comando);
+
+        //Generar el comando confirmacion voto y enviarlo
+        Comando010 comando010 = new Comando010(comando.getVoto(), true);
+        PlanificadorMensajesSalida.sendCommand(comando.getIp(), comando010);
+
+    }
+
+    private void proceesarComando10(Comando010 comando) {
+        PlanificadorPresi.confirmarVoto(comando);
+    }
+
+    private void proceesarComando11(Comando011 comando) {
+        PlanificadorTransaccion.commitVoto(comando);
+
+    }
+
+    private boolean isMyIP(String ip) {
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
@@ -69,7 +96,7 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
-                    if(ip.equals(addr.getHostAddress())){
+                    if (ip.equals(addr.getHostAddress())) {
                         return true;
                     }
                 }

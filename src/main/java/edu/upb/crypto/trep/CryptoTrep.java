@@ -7,11 +7,16 @@ import edu.upb.crypto.trep.config.MyProperties;
 import edu.upb.crypto.trep.httpserver.ApacheServer;
 import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesEntrada;
 import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesSalida;
+import edu.upb.crypto.trep.modsincronizacion.PlanificadorPresi;
+import edu.upb.crypto.trep.modsincronizacion.PlanificadorTransaccion;
 import edu.upb.crypto.trep.modsincronizacion.server.Zeus;
 import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -27,6 +32,13 @@ public class CryptoTrep {
         ps.start();
         PlanificadorMensajesEntrada pe = new PlanificadorMensajesEntrada();
         pe.start();
+
+        PlanificadorPresi pp = new PlanificadorPresi();
+        PlanificadorTransaccion trans = new PlanificadorTransaccion();
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+        scheduler.scheduleAtFixedRate(trans, 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(pp, 0, 1, TimeUnit.SECONDS);
+
 
         if (MyProperties.IS_NODO_PRINCIPAL) {
             Zeus server = new Zeus();

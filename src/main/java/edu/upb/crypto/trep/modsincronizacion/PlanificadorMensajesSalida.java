@@ -1,29 +1,18 @@
 package edu.upb.crypto.trep.modsincronizacion;
 
 import edu.upb.crypto.trep.DataBase.models.Candidato;
-import edu.upb.crypto.trep.bl.Comando;
-import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
-import edu.upb.crypto.trep.bl.SincronizacionNodos;
+import edu.upb.crypto.trep.bl.*;
 import edu.upb.crypto.trep.config.MyProperties;
 import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
 import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
-    private static final ConcurrentLinkedQueue<Comando> messages = new ConcurrentLinkedQueue<>();
-    private static final ConcurrentHashMap<String, SocketClient> nodos = new ConcurrentHashMap<>();
-    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
-    private List<Future> list = new ArrayList<>();
-
+    private static final Queue<Comando> messages = new ConcurrentLinkedQueue<>();
+    private static final Map<String, SocketClient> nodos = new HashMap<>();
 
     public PlanificadorMensajesSalida() {
 
@@ -40,27 +29,34 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
                         throw new RuntimeException(e);
                     }
                 }
-               list.add(executor.submit(() -> {
+                if (!messages.isEmpty()) {
                     Comando comando = messages.poll();
+                    if (comando.getCodigoComando().equals(Comando09.CODIGO_COMANDO)) {
+                        Comando09 vc = (Comando09) comando;
+
+                    }
                     sendMessage(comando);
-                }));
-               
-               if(list.size()>10){
-                   for (Future future : list) {
-                       try {
-                           future.get();
-                       } catch (Exception ex) {
-                           ex.printStackTrace();
-                       }
-                   }
-                   System.out.println("Sali: Dejando de dormir");
-                   list.clear();
-                   messages.notify();
-               }
+                }
             }
         }
     }
 
+    /**
+     * Método para enviar un voto a los demás nodos
+     * @param comando
+     */
+    public static void addVoto(Comando09 comando) {
+        synchronized (messages) {
+            messages.add(comando);
+            messages.notify();
+        }
+    }
+
+
+    /**
+     * Método para enviar el mensaje a los demás nodos
+     * @param comando
+     */
     public static void addMessage(Comando comando) {
         synchronized (messages) {
             messages.add(comando);
@@ -68,9 +64,17 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
         }
     }
 
+    public static void sendCommand(String ip, Comando comando) {
+        SocketClient client = nodos.get(ip);
+        if (client != null) {
+            client.send(comando);
+            System.out.println("Comando enviado al cliente: " + ip);
+        }
+    }
+
     private void sendMessage(Comando comando) {
         for (SocketClient nodo : nodos.values()) {
-            if( nodo == null || !nodo.isAlive()){
+            if (nodo == null || !nodo.isAlive()) {
                 nodos.remove(nodo.getIp());
                 return;
             }
@@ -115,6 +119,15 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
         }
     }
 
+    public static int getCantidadNodos(){
+        return nodos.size();
+    }
+
+    public static void removeCliente(String ip) {
+        synchronized (nodos) {
+            nodos.remove(ip);
+        }
+    }
     @Override
     public void onCloseNodo(SocketClient client) {
 

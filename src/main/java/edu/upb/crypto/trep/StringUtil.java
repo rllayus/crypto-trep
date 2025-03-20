@@ -11,8 +11,12 @@ public class StringUtil {
         return s.substring(s.length() - length);
     }
 
-
-
+    public static boolean isNull(String str) {
+        if (str == null) {
+            return true;
+        }
+        return str.trim().isEmpty();
+    }
     public static String trim(String valor) {
         if (valor == null)
             return null;

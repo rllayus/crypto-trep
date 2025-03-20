@@ -4,10 +4,8 @@
  */
 package edu.upb.crypto.trep.modsincronizacion.server;
 
-import edu.upb.crypto.trep.bl.AltaCandidato;
-import edu.upb.crypto.trep.bl.Comando;
-import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
-import edu.upb.crypto.trep.bl.SincronizacionNodos;
+import edu.upb.crypto.trep.bl.*;
+import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesSalida;
 import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 import lombok.Getter;
 
@@ -45,6 +43,7 @@ public class SocketClient extends Thread {
             String message;
             while ((message = br.readLine()) != null) {
                 String[] tokens = message.split(Pattern.quote("|"));
+                System.out.println(message);
                 Comando comando = null;
                 switch (tokens[0]) {
                     case "0001":
@@ -59,6 +58,19 @@ public class SocketClient extends Thread {
                         comando = new AltaCandidato(this.ip);
                         comando.parsear(message);
                         break;
+                    case "0009":
+                        comando = new Comando09(this.ip);
+                        comando.parsear(message);
+                        break;
+                    case "0010":
+                        comando = new Comando010(this.ip);
+                        comando.parsear(message);
+                        break;
+
+                    case "0011":
+                        comando = new Comando011(this.ip);
+                        comando.parsear(message);
+                        break;
 
                 }
 
@@ -66,12 +78,25 @@ public class SocketClient extends Thread {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            PlanificadorMensajesSalida.removeCliente(this.ip);
+        } catch (Exception e) {
+            e.printStackTrace();
+            PlanificadorMensajesSalida.removeCliente(this.ip);
         }
     }
 
     public synchronized void send(String mensaje) throws IOException {
         try {
             dout.write(mensaje.getBytes(StandardCharsets.UTF_8));
+            dout.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void send(Comando comando) {
+        try {
+            dout.write(comando.getComando().getBytes(StandardCharsets.UTF_8));
             dout.flush();
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,14 +111,6 @@ public class SocketClient extends Thread {
         for (SocketEvent e : listenerList.getListeners(SocketEvent.class)) {
             e.onMessage(comando);
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        SocketClient sc = new SocketClient(new Socket("localhost", 1825));
-        sc.start();
-        sc.send("Hola!!!!" + System.lineSeparator());
-        System.out.println("Conectado al servidor: ");
-
     }
 
 }

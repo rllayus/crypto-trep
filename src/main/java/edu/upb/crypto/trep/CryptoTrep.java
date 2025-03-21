@@ -40,15 +40,15 @@ public class CryptoTrep {
         scheduler.scheduleAtFixedRate(pp, 0, 1, TimeUnit.SECONDS);
 
 
-        if (MyProperties.IS_NODO_PRINCIPAL) {
-            Zeus server = new Zeus();
-            server.start();
-            server.addListener(ps);// Planificador de salida se suscribe a los eventos del server
-            server.addPlanificadorEntrada(pe);
+        //if (MyProperties.IS_NODO_PRINCIPAL) {
 
-            ApacheServer apacheServer = new ApacheServer();
-            apacheServer.start();
-        }
+        //}
+        Zeus server = new Zeus();
+        server.start();
+        server.addListener(ps);// Planificador de salida se suscribe a los eventos del server
+        server.addPlanificadorEntrada(pe);
+        ApacheServer apacheServer = new ApacheServer();
+        apacheServer.start();
 
         System.out.println(":::::::::::::::: Crypto Trep Iniciando ::::::::::::::::::");
         System.out.println(":::::::::::::::: NODO PRINCIPAL: " + MyProperties.IS_NODO_PRINCIPAL + " :::::::::::::::::::");

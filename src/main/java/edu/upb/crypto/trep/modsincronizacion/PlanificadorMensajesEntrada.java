@@ -6,6 +6,7 @@ import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -56,7 +57,10 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
         for (String ip : comando.getIps()) {
             try {
                 if (!isMyIP(ip)) {
-
+                    SocketClient client = new SocketClient(new Socket(ip, 1825));
+                    client.start();
+                    PlanificadorMensajesSalida.addNode(client);
+                    System.out.println("PME - Conectado al nodo: " + ip);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

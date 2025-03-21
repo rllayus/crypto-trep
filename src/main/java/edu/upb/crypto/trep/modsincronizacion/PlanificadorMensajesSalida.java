@@ -87,6 +87,12 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
     }
 
+    public static void addNode(SocketClient nodo) {
+        synchronized (nodos) {
+            nodos.put(nodo.getIp(), nodo);
+        }
+    }
+
     @Override
     public void onNewNodo(SocketClient client) {
         synchronized (nodos) {

@@ -77,10 +77,12 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
         //Generar el comando confirmacion voto y enviarlo
         Comando010 comando010 = new Comando010(comando.getVoto(), true);
         PlanificadorMensajesSalida.sendCommand(comando.getIp(), comando010);
+        System.out.println("Enviando comando 10 a: "+comando.getIp());
 
     }
 
     private void proceesarComando10(Comando010 comando) {
+        if(comando != null)
         PlanificadorPresi.confirmarVoto(comando);
     }
 
@@ -124,6 +126,7 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
 
     @Override
     public void onMessage(Comando comando) {
+        System.out.println("comando:" + comando.getCodigoComando());
         synchronized (messages) {
             messages.add(comando);
             messages.notify();

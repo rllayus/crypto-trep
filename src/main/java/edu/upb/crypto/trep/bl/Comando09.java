@@ -35,13 +35,14 @@ public class Comando09 extends Comando {
         String[] tokens = comando.split(Pattern.quote("|"));
         System.out.println("Longitud :" + tokens.length);
         if (tokens.length >= 2) {
-            System.out.println("Comando09");
             setCodigoComando(tokens[0]);
             String[] votoArray = tokens[1].split(",");
             if(votoArray.length == 3) {
                 this.firma = tokens[2];
             }
-            this.voto = new Voto(votoArray[0], Long.parseLong(votoArray[1]), votoArray[2], votoArray[3]);
+            this.voto = new Voto(votoArray[0], Long.parseLong(votoArray[1]),
+                    votoArray[2], votoArray[3]);
+            System.out.println("Comando 9 interpretado");
         }
     }
 

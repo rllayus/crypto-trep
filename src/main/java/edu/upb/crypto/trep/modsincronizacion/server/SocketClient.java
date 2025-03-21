@@ -73,7 +73,7 @@ public class SocketClient extends Thread {
                         break;
 
                 }
-
+                if(comando != null)
                 notificar(comando);
             }
         } catch (IOException e) {

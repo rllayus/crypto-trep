@@ -21,7 +21,8 @@ public class PlanificadorTransaccion implements Runnable {
 
             if (comando.getCodigoComando().equals(Comando09.CODIGO_COMANDO)) {
                 Comando09 vc = (Comando09) comando;
-                System.out.println("Comando ID: " + ((Comando09) comando).getVoto().getId());
+                System.out.println("Comando ID: " + 
+                        ((Comando09) comando).getVoto().getId());
                 if (System.currentTimeMillis() - vc.getVoto().getTimestamp() > 10000) {
                     // ya finalizó su tiempo de espera, se debe generar comando 10 con rechazo
                     System.out.println("Tiempo de espera finalizado");

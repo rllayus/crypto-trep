@@ -33,13 +33,7 @@ public class Zeus extends Thread {
         while (true) {
             try {
                 Socket socket = this.serverSocket.accept();
-                if(sockets.size() > 5){
-                    System.out.println("Conexion cerrada: "+sockets.size());
-                    socket.close();
-                    socket.shutdownInput();
-                    socket.shutdownOutput();
-                    return;
-                }
+               
                 this.sockets.add(socket);
                 SocketClient sc = new SocketClient(socket);
                 sc.start();

@@ -68,7 +68,6 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
         SocketClient client = nodos.get(ip);
         if (client != null) {
             client.send(comando);
-            System.out.println("Comando enviado al cliente: " + ip);
         }
     }
 
@@ -94,7 +93,6 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
         }
         System.out.println("Nuevo Nodo " + client.getIp());
         if (MyProperties.IS_NODO_PRINCIPAL) {
-            System.out.println("Es nodo pro " + client.getIp());
             // preparar el comando y enviar  a todo
             Comando comando = new SincronizacionNodos(new ArrayList<>(nodos.keySet()));
             try {
@@ -126,6 +124,7 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
     public static void removeCliente(String ip) {
         synchronized (nodos) {
             nodos.remove(ip);
+            System.out.println("Eliminando nodo");
         }
     }
     @Override

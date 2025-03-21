@@ -1,14 +1,19 @@
 package edu.upb.crypto.trep.modsincronizacion;
 
 import edu.upb.crypto.trep.DataBase.models.Candidato;
-import edu.upb.crypto.trep.bl.*;
+import edu.upb.crypto.trep.bl.Comando;
+import edu.upb.crypto.trep.bl.Comando09;
+import edu.upb.crypto.trep.bl.SincronizacionCandidatos;
+import edu.upb.crypto.trep.bl.SincronizacionNodos;
 import edu.upb.crypto.trep.config.MyProperties;
 import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
 import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+@Slf4j
 public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
     private static final Queue<Comando> messages = new ConcurrentLinkedQueue<>();
@@ -30,12 +35,7 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
                     }
                 }
                 if (!messages.isEmpty()) {
-                    Comando comando = messages.poll();
-                    if (comando.getCodigoComando().equals(Comando09.CODIGO_COMANDO)) {
-                        Comando09 vc = (Comando09) comando;
-
-                    }
-                    sendMessage(comando);
+                    sendMessage(messages.poll());
                 }
             }
         }
@@ -43,6 +43,7 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
     /**
      * Método para enviar un voto a los demás nodos
+     *
      * @param comando
      */
     public static void addVoto(Comando09 comando) {
@@ -55,6 +56,7 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
     /**
      * Método para enviar el mensaje a los demás nodos
+     *
      * @param comando
      */
     public static void addMessage(Comando comando) {
@@ -73,12 +75,15 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
 
     private void sendMessage(Comando comando) {
         for (SocketClient nodo : nodos.values()) {
-            if (nodo == null || !nodo.isAlive()) {
+            if (!nodo.isConnected()) {
+                log.info("Eliminando nodo porque no esta conectado: {}", nodo.getIp());
                 nodos.remove(nodo.getIp());
                 return;
             }
+
             try {
-                nodo.send(comando.getComando());
+                nodo.send(comando);
+                log.info("Comando [ {} ] Enviado a IP:{}", comando.getComando(), nodo.getIp());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -95,11 +100,16 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
     @Override
     public void onNewNodo(SocketClient client) {
         synchronized (nodos) {
-            nodos.put(client.getIp(), client);
+            if (nodos.containsKey(client.getIp())) {
+                log.info("Ya existía el nodo, por lo que se reemplaza");
+                nodos.replace(client.getIp(), client);
+            } else {
+                nodos.put(client.getIp(), client);
+            }
         }
-        System.out.println("Nuevo Nodo " + client.getIp());
+
+        log.info("Nuevo nodo agregado:" + client.getIp());
         if (MyProperties.IS_NODO_PRINCIPAL) {
-            // preparar el comando y enviar  a todo
             Comando comando = new SincronizacionNodos(new ArrayList<>(nodos.keySet()));
             try {
                 client.send(comando.getComando());
@@ -123,16 +133,18 @@ public class PlanificadorMensajesSalida extends Thread implements SocketEvent {
         }
     }
 
-    public static int getCantidadNodos(){
+    public static int getCantidadNodos() {
+        log.info("Cantidad de nodos: {}", nodos.size());
         return nodos.size();
     }
 
     public static void removeCliente(String ip) {
         synchronized (nodos) {
             nodos.remove(ip);
-            System.out.println("Eliminando nodo");
+            log.info("Eliminando nodo: {}", ip);
         }
     }
+
     @Override
     public void onCloseNodo(SocketClient client) {
 

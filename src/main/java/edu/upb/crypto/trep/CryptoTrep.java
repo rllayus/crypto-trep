@@ -11,17 +11,20 @@ import edu.upb.crypto.trep.modsincronizacion.PlanificadorPresi;
 import edu.upb.crypto.trep.modsincronizacion.PlanificadorTransaccion;
 import edu.upb.crypto.trep.modsincronizacion.server.Zeus;
 import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  *
  * @author rlaredo
  */
+@Slf4j
 public class CryptoTrep {
 
     public static void main(String[] args) throws IOException {
@@ -40,25 +43,23 @@ public class CryptoTrep {
         scheduler.scheduleAtFixedRate(pp, 0, 1, TimeUnit.SECONDS);
 
 
-        //if (MyProperties.IS_NODO_PRINCIPAL) {
-
-        //}
-        Zeus server = new Zeus();
-        server.start();
-        server.addListener(ps);// Planificador de salida se suscribe a los eventos del server
-        server.addPlanificadorEntrada(pe);
-        ApacheServer apacheServer = new ApacheServer();
-        apacheServer.start();
+        if (System.getenv("IS_PRINCIPAL").equals("true")) {
+            Zeus server = new Zeus();
+            server.start();
+            server.addListener(ps);// Planificador de salida se suscribe a los eventos del server
+            server.addPlanificadorEntrada(pe);
+            ApacheServer apacheServer = new ApacheServer();
+            apacheServer.start();
+        }
 
         System.out.println(":::::::::::::::: Crypto Trep Iniciando ::::::::::::::::::");
-        System.out.println(":::::::::::::::: NODO PRINCIPAL: " + MyProperties.IS_NODO_PRINCIPAL + " :::::::::::::::::::");
+        System.out.println(":::::::::::::::: NODO PRINCIPAL: " + System.getenv("IS_PRINCIPAL") + " :::::::::::::::::::");
         System.out.println(":::::::::::::::: IP NODO PRINCIPAL: " + MyProperties.IP_NODO_PRINCIPAL + " :::::::::");
-        if (!MyProperties.IS_NODO_PRINCIPAL) {
+        if (System.getenv("IS_PRINCIPAL").equals("false")) {
             SocketClient socketClient = new SocketClient(new Socket(MyProperties.IP_NODO_PRINCIPAL, 1825));
             socketClient.start();
             ps.onNewNodo(socketClient);
             socketClient.addListerner(pe);
-
         }
 
     }

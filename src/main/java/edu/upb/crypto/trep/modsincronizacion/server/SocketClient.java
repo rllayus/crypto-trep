@@ -8,6 +8,7 @@ import edu.upb.crypto.trep.bl.*;
 import edu.upb.crypto.trep.modsincronizacion.PlanificadorMensajesSalida;
 import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.event.EventListenerList;
 import java.io.BufferedReader;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 /**
  * @author rlaredo
  */
+@Slf4j
 @Getter
 public class SocketClient extends Thread {
 
@@ -43,7 +45,7 @@ public class SocketClient extends Thread {
             String message;
             while ((message = br.readLine()) != null) {
                 String[] tokens = message.split(Pattern.quote("|"));
-                System.out.println(message);
+                log.info("Recibido: "+this.ip+" "+message);
                 Comando comando = null;
                 switch (tokens[0]) {
                     case "0001":
@@ -73,8 +75,8 @@ public class SocketClient extends Thread {
                         break;
 
                 }
-                if(comando != null)
-                notificar(comando);
+                if (comando != null)
+                    notificar(comando);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -111,6 +113,10 @@ public class SocketClient extends Thread {
         for (SocketEvent e : listenerList.getListeners(SocketEvent.class)) {
             e.onMessage(comando);
         }
+    }
+
+    public boolean isConnected() {
+        return this.socket.isConnected();
     }
 
 }

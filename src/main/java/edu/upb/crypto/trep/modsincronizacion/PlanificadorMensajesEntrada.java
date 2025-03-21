@@ -3,6 +3,7 @@ package edu.upb.crypto.trep.modsincronizacion;
 import edu.upb.crypto.trep.bl.*;
 import edu.upb.crypto.trep.modsincronizacion.server.SocketClient;
 import edu.upb.crypto.trep.modsincronizacion.server.event.SocketEvent;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -11,6 +12,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+@Slf4j
 public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
 
     private static final ConcurrentLinkedQueue<Comando> messages = new ConcurrentLinkedQueue<>();
@@ -33,7 +35,7 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
                 }
                 comando = messages.poll();
             }
-            System.out.println(comando.getCodigoComando());
+            log.info("Comando: " + comando.getComando());
             switch (comando.getCodigoComando()) {
                 case "0001":
                     proceesarComando1((SincronizacionNodos) comando);
@@ -56,11 +58,15 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
         // Conectarse a todos los clientes
         for (String ip : comando.getIps()) {
             try {
+                log.info("IP A CONECTAR: " + ip);
+                if (ip.equals("127.0.0.1") || ip.equals("localhost")) {
+                    return;
+                }
                 if (!isMyIP(ip)) {
                     SocketClient client = new SocketClient(new Socket(ip, 1825));
                     client.start();
                     PlanificadorMensajesSalida.addNode(client);
-                    System.out.println("PME - Conectado al nodo: " + ip);
+                    log.info("PME - Conectado al nodo: " + ip);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -77,18 +83,16 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
         //Generar el comando confirmacion voto y enviarlo
         Comando010 comando010 = new Comando010(comando.getVoto(), true);
         PlanificadorMensajesSalida.sendCommand(comando.getIp(), comando010);
-        System.out.println("Enviando comando 10 a: "+comando.getIp());
-
+        log.info("Respondiendo CMD  [{}] a IP: {}", comando010.getComando(),  comando.getIp());
     }
 
     private void proceesarComando10(Comando010 comando) {
-        if(comando != null)
-        PlanificadorPresi.confirmarVoto(comando);
+        if (comando != null)
+            PlanificadorPresi.confirmarVoto(comando);
     }
 
     private void proceesarComando11(Comando011 comando) {
         PlanificadorTransaccion.commitVoto(comando);
-
     }
 
     private boolean isMyIP(String ip) {
@@ -126,7 +130,6 @@ public class PlanificadorMensajesEntrada extends Thread implements SocketEvent {
 
     @Override
     public void onMessage(Comando comando) {
-        System.out.println("comando:" + comando.getCodigoComando());
         synchronized (messages) {
             messages.add(comando);
             messages.notify();
